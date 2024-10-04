@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stylish Analog Clock with Roman Numerals</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: url('https://png.pngtree.com/background/20230612/original/pngtree-small-room-showing-an-old-library-with-books-all-over-the-picture-image_3184759.jpg') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Georgia', serif; /* Changed font to a more classic style */
+            transition: background-color 0.3s;
+        }
+        .clock-container {
+            position: relative;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8); /* Added a semi-transparent background */
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        .clock {
+            width: 320px;
+            height: 320px;
+            border: 15px solid #8B4513; /* Changed border color to a wood-like color */
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8), rgba(221, 221, 221, 0.8));
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        .hand {
+            position: absolute;
+            top: 50%;
+            right: 50%;
+            transform-origin: 100% 50%;
+            transform: rotate(90deg);
+        }
+        .hour {
+            width: 25%;
+            height: 8px;
+            background: #8B4513; /* Changed color to match the wood theme */
+            border-radius: 4px;
+        }
+        .minute {
+            width: 35%;
+            height: 6px;
+            background: #A0522D; /* Changed color to match the wood theme */
+            border-radius: 3px;
+        }
+        .second {
+            width: 40%;
+            height: 2px;
+            background: #CD5C5C; /* Changed color to a more muted red */
+            border-radius: 1px;
+            transition: all 0.05s cubic-bezier(0.1, 2.7, 0.58, 1);
+        }
+        .center-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #8B4513; /* Changed color to match the wood theme */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .number {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transform: rotate(var(--rotation));
+            font-size: 20px;
+            font-weight: bold;
+            color: #8B4513; /* Changed color to match the wood theme */
+        }
+        .number span {
+            display: inline-block;
+            transform: rotate(calc(-1 * var(--rotation)));
+        }
+        .date-display {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #8B4513; /* Changed color to match the wood theme */
+        }
+        .mode-toggle {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #8B4513; /* Changed color to match the wood theme */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
+        }
+        .mode-toggle:hover {
+            background-color: #A0522D; /* Changed hover color to match the wood theme */
+        }
+        .dark-mode {
+            background-color: #333;
+        }
+        .dark-mode .clock {
+            border-color: #f0f0f0;
+            background: radial-gradient(circle, #222, #111);
+        }
+        .dark-mode .number, .dark-mode .date-display {
+            color: #f0f0f0;
+        }
+        .dark-mode .center-dot, .dark-mode .hour, .dark-mode .minute {
+            background: #f0f0f0;
+        }
+        .clock:hover {
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="clock">
+            <div class="hand hour" id="hour"></div>
+            <div class="hand minute" id="minute"></div>
+            <div class="hand second" id="second"></div>
+            <div class="center-dot"></div>
+            <div class="number" style="--rotation: 0deg"><span>XII</span></div>
+            <div class="number" style="--rotation: 30deg"><span>I</span></div>
+            <div class="number" style="--rotation: 60deg"><span>II</span></div>
+            <div class="number" style="--rotation: 90deg"><span>III</span></div>
+            <div class="number" style="--rotation: 120deg"><span>IV</span></div>
+            <div class="number" style="--rotation: 150deg"><span>V</span></div>
+            <div class="number" style="--rotation: 180deg"><span>VI</span></div>
+            <div class="number" style="--rotation: 210deg"><span>VII</span></div>
+            <div class="number" style="--rotation: 240deg"><span>VIII</span></div>
+            <div class="number" style="--rotation: 270deg"><span>IX</span></div>
+            <div class="number" style="--rotation: 300deg"><span>X</span></div>
+            <div class="number" style="--rotation: 330deg"><span>XI</span></div>
+            <div class="date-display" id="date"></div>
+        </div>
+    </div>
+    <button class="mode-toggle" id="modeToggle">Toggle Dark Mode</button>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const seconds = now.getSeconds();
+            const minutes = now.getMinutes();
+            const hours = now.getHours();
+
+            const secondDegrees = ((seconds / 60) * 360) + 90;
+            const minuteDegrees = ((minutes / 60) * 360) + ((seconds/60)*6) + 90;
+            const hourDegrees = ((hours / 12) * 360) + ((minutes/60)*30) + 90;
+
+            document.getElementById('second').style.transform = `rotate(${secondDegrees}deg)`;
+            document.getElementById('minute').style.transform = `rotate(${minuteDegrees}deg)`;
+            document.getElementById('hour').style.transform = `rotate(${hourDegrees}deg)`;
+
+            // Update date display
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date').textContent = now.toLocaleDateString(undefined, options);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock(); // initial call to set the clock
+
+        // Dark mode toggle
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+        });
+    </script>
+</body>
+</html>
